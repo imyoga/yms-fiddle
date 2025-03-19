@@ -4,10 +4,36 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
+    <title>YM's Fiddle</title>
+    <link rel="stylesheet" href="/src/style.css">
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <div class="header-bar">
+        <div class="logo">YM's Fiddle</div>
+        <div class="actions">
+          <button id="export-btn" class="btn">Export as ZIP</button>
+        </div>
+      </div>
+      <div class="editor-container">
+        <div class="editor-panel">
+          <div class="editor-header">HTML</div>
+          <div id="html-editor" class="editor"></div>
+        </div>
+        <div class="editor-panel">
+          <div class="editor-header">CSS</div>
+          <div id="css-editor" class="editor"></div>
+        </div>
+        <div class="editor-panel">
+          <div class="editor-header">JavaScript</div>
+          <div id="js-editor" class="editor"></div>
+        </div>
+        <div class="result-panel">
+          <div class="editor-header">Result</div>
+          <iframe id="result-frame" class="result-frame"></iframe>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
