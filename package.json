@@ -16,9 +16,13 @@
     "@codemirror/lang-html": "^6.4.9",
     "@codemirror/lang-javascript": "^6.2.3",
     "@codemirror/language": "^6.11.0",
+    "@codemirror/lint": "^6.8.4",
     "@codemirror/state": "^6.5.2",
     "@codemirror/theme-one-dark": "^6.1.2",
     "@codemirror/view": "^6.36.4",
+    "@lezer/common": "^1.2.3",
+    "@lezer/highlight": "^1.2.1",
+    "@replit/codemirror-minimap": "^0.5.2",
     "codemirror": "^6.0.1",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1"

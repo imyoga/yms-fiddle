@@ -5,6 +5,7 @@ import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
+import { showMinimap } from '@replit/codemirror-minimap';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 
@@ -43,6 +44,21 @@ document.addEventListener('DOMContentLoaded', () => {
 // Initialize editors
 let htmlEditor, cssEditor, jsEditor;
 
+// Create minimap setup
+function createMinimap() {
+  const dom = document.createElement('div');
+  return { dom };
+}
+
+// Minimap configuration
+const minimapConfig = showMinimap.compute(['doc'], (state) => {
+  return {
+    create: createMinimap,
+    displayText: 'blocks',
+    showOverlay: 'always',
+  };
+});
+
 // Initialize the editors with CodeMirror
 function initEditors() {
   // HTML Editor
@@ -53,6 +69,7 @@ function initEditors() {
         basicSetup,
         html(),
         oneDark,
+        minimapConfig,
         EditorView.updateListener.of(update => {
           if (update.docChanged) {
             updatePreview();
@@ -71,6 +88,7 @@ function initEditors() {
         basicSetup,
         css(),
         oneDark,
+        minimapConfig,
         EditorView.updateListener.of(update => {
           if (update.docChanged) {
             updatePreview();
@@ -89,6 +107,7 @@ function initEditors() {
         basicSetup,
         javascript(),
         oneDark,
+        minimapConfig,
         EditorView.updateListener.of(update => {
           if (update.docChanged) {
             updatePreview();

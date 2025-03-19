@@ -184,3 +184,36 @@ body {
     grid-template-rows: repeat(4, 1fr);
   }
 }
+
+/* CodeMirror minimap styling */
+.cm-minimap {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  z-index: 99;
+  background-color: var(--vscode-editor-bg);
+  border-left: 1px solid var(--vscode-border);
+  overflow: hidden;
+}
+
+.cm-minimap-overlay {
+  background-color: rgba(85, 85, 85, 0.3);
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  position: absolute;
+}
+
+.editor-panel {
+  position: relative;
+}
+
+/* Adjusting main editor content to make space for minimap */
+.editor-panel .cm-content {
+  padding-right: 40px;
+}
+
+/* Ensure gutters don't have extra padding */
+.editor-panel .cm-gutters {
+  padding-right: 0;
+}
