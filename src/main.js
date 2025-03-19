@@ -198,4 +198,181 @@ function exportProject() {
 }
 
 // Initialize the application when DOM is loaded
-document.addEventListener('DOMContentLoaded', initEditors);
+document.addEventListener('DOMContentLoaded', () => {
+  initEditors();
+  initChat();
+});
+
+// Initialize chat functionality
+function initChat() {
+  const chatInput = document.getElementById('chat-input');
+  const chatSendBtn = document.getElementById('chat-send');
+  const chatMessages = document.getElementById('chat-messages');
+  
+  // Sample initial message
+  addMessage('Welcome to YM Fiddle Chat! I can help with HTML, CSS, and JavaScript. Ask me anything or request code samples.', 'other');
+  
+  // Send button click handler
+  chatSendBtn.addEventListener('click', () => {
+    sendMessage();
+  });
+  
+  // Enter key press handler
+  chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      sendMessage();
+    }
+  });
+  
+  // Function to send a message
+  function sendMessage() {
+    const message = chatInput.value.trim();
+    if (message) {
+      // Add user message to chat
+      addMessage(message, 'user');
+      
+      // Clear input field
+      chatInput.value = '';
+      
+      // Create a message div for the AI response
+      const responseDiv = document.createElement('div');
+      responseDiv.classList.add('message');
+      responseDiv.classList.add('message-other');
+      chatMessages.appendChild(responseDiv);
+      
+      // Scroll to the bottom
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      
+      // Stream response from Ollama API
+      streamOllamaResponse(message, responseDiv);
+    }
+  }
+  
+  // Function to stream response from Ollama API
+  async function streamOllamaResponse(message, responseDiv) {
+    try {
+      const response = await fetch('http://localhost:11434/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          model: 'qwen2.5-coder:1.5b',
+          prompt: `User question: ${message}\n\nPlease respond with concise, helpful information, explanations, or code examples. Keep explanations brief and to the point.`,
+          stream: true
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.statusText}`);
+      }
+      
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedResponse = '';
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        
+        if (done) {
+          break;
+        }
+        
+        // Decode the chunk
+        const chunk = decoder.decode(value, { stream: true });
+        
+        // Parse the JSON data (Ollama sends each chunk as a JSON object)
+        const lines = chunk.split('\n').filter(line => line.trim() !== '');
+        
+        for (const line of lines) {
+          try {
+            const data = JSON.parse(line);
+            if (data.response) {
+              // Append to accumulated response
+              accumulatedResponse += data.response;
+              
+              // Format and update the response div
+              responseDiv.innerHTML = formatMarkdown(accumulatedResponse);
+              
+              // Scroll to the bottom
+              chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+          } catch (e) {
+            console.error('Error parsing JSON:', e);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error streaming from Ollama API:', error);
+      responseDiv.textContent = `Sorry, I had trouble connecting to the AI service: ${error.message}`;
+    }
+  }
+  
+  // Function to add a message to the chat
+  function addMessage(text, type) {
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('message');
+    messageDiv.classList.add(`message-${type}`);
+    
+    if (type === 'other') {
+      // Format all AI responses with markdown-style formatting
+      const formattedText = formatMarkdown(text);
+      messageDiv.innerHTML = formattedText;
+    } else {
+      messageDiv.textContent = text;
+    }
+    
+    chatMessages.appendChild(messageDiv);
+    
+    // Scroll to the bottom
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    
+    return messageDiv;
+  }
+  
+  // Function to format all markdown content
+  function formatMarkdown(text) {
+    // Handle code blocks with syntax highlighting
+    let formattedText = text.replace(/```(\w+)([\s\S]*?)```/g, function(match, language, code) {
+      return `<pre><code class="${language}">${code.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+    });
+    
+    // Handle code blocks without language specification
+    formattedText = formattedText.replace(/```([\s\S]*?)```/g, function(match, code) {
+      return `<pre><code>${code.trim().replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`;
+    });
+    
+    // Handle inline code blocks
+    formattedText = formattedText.replace(/`([^`]+)`/g, function(match, code) {
+      return `<code>${code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code>`;
+    });
+    
+    // Handle headers
+    formattedText = formattedText.replace(/^### (.*$)/gm, '<h3>$1</h3>');
+    formattedText = formattedText.replace(/^## (.*$)/gm, '<h2>$1</h2>');
+    formattedText = formattedText.replace(/^# (.*$)/gm, '<h1>$1</h1>');
+    
+    // Handle bold
+    formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    
+    // Handle italic
+    formattedText = formattedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Handle links
+    formattedText = formattedText.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+    
+    // Handle unordered lists
+    formattedText = formattedText.replace(/^\s*\*\s+(.*)/gm, '<li>$1</li>');
+    formattedText = formattedText.replace(/<\/li>\s*<li>/g, '</li><li>');
+    formattedText = formattedText.replace(/(<li>.*<\/li>)/g, '<ul>$1</ul>');
+    
+    // Handle ordered lists
+    formattedText = formattedText.replace(/^\s*\d+\.\s+(.*)/gm, '<li>$1</li>');
+    formattedText = formattedText.replace(/(<li>.*<\/li>)/g, '<ol>$1</ol>');
+    
+    // Convert newlines to <br> for remaining newlines
+    formattedText = formattedText.replace(/\n/g, '<br>');
+    
+    return formattedText;
+  }
+}

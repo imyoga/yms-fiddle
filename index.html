@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>YM's Fiddle</title>
+    <title>YM Fiddle</title>
     <link rel="stylesheet" href="/src/style.css">
   </head>
   <body>
@@ -19,22 +19,38 @@
           <button id="export-btn" class="btn">Export as ZIP</button>
         </div>
       </div>
-      <div class="editor-container">
-        <div class="editor-panel">
-          <div class="editor-header">HTML</div>
-          <div id="html-editor" class="editor"></div>
+      <div class="main-container">
+        <div class="chat-container">
+          <div class="chat-header">
+            Chat
+            <div class="info-icon">
+              ℹ️
+              <span class="tooltip">This chat requires an Ollama server running on localhost:11434. Make sure you have Ollama installed and running with the qwen2.5-coder:1.5b model.</span>
+            </div>
+          </div>
+          <div class="chat-messages" id="chat-messages"></div>
+          <div class="chat-input-container">
+            <input type="text" id="chat-input" class="chat-input" placeholder="Type your message...">
+            <button id="chat-send" class="btn chat-send-btn">Send</button>
+          </div>
         </div>
-        <div class="editor-panel">
-          <div class="editor-header">CSS</div>
-          <div id="css-editor" class="editor"></div>
-        </div>
-        <div class="editor-panel">
-          <div class="editor-header">JavaScript</div>
-          <div id="js-editor" class="editor"></div>
-        </div>
-        <div class="result-panel">
-          <div class="editor-header">Result</div>
-          <iframe id="result-frame" class="result-frame"></iframe>
+        <div class="editor-container">
+          <div class="editor-panel">
+            <div class="editor-header">HTML</div>
+            <div id="html-editor" class="editor"></div>
+          </div>
+          <div class="editor-panel">
+            <div class="editor-header">CSS</div>
+            <div id="css-editor" class="editor"></div>
+          </div>
+          <div class="editor-panel">
+            <div class="editor-header">JavaScript</div>
+            <div id="js-editor" class="editor"></div>
+          </div>
+          <div class="result-panel">
+            <div class="editor-header">Result</div>
+            <iframe id="result-frame" class="result-frame"></iframe>
+          </div>
         </div>
       </div>
     </div>

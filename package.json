@@ -25,6 +25,7 @@
     "@replit/codemirror-minimap": "^0.5.2",
     "codemirror": "^6.0.1",
     "file-saver": "^2.0.5",
-    "jszip": "^3.10.1"
+    "jszip": "^3.10.1",
+    "split-grid": "^1.0.11"
   }
 }
