@@ -36,9 +36,11 @@ body {
 #app {
   width: 100%;
   height: 100vh;
+  max-height: 100vh;
   padding: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .header-bar {
@@ -114,6 +116,8 @@ body {
   gap: 4px;
   flex: 1;
   padding: 4px;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .editor-panel, .result-panel {
@@ -122,6 +126,7 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 .editor-header {
@@ -141,6 +146,8 @@ body {
   font-family: 'Consolas', 'Courier New', monospace;
   font-size: 14px;
   line-height: 1.5;
+  flex: 1;
+  min-height: 0;
 }
 
 .result-frame {
@@ -153,14 +160,21 @@ body {
 /* For CodeMirror styling */
 .cm-editor {
   height: 100% !important;
+  overflow: auto !important;
 }
 
 .cm-editor .cm-scroller {
   font-family: 'Consolas', 'Courier New', monospace !important;
+  overflow: auto !important;
 }
 
 .cm-editor .cm-content {
   padding: 4px 0 !important;
+  min-height: 100% !important;
+}
+
+.cm-editor .cm-gutters {
+  height: auto !important;
 }
 
 /* Responsive layout */
