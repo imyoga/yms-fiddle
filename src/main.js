@@ -53,6 +53,11 @@ function initEditors() {
         basicSetup,
         html(),
         oneDark,
+        EditorView.updateListener.of(update => {
+          if (update.docChanged) {
+            updatePreview();
+          }
+        })
       ]
     }),
     parent: document.getElementById('html-editor')
@@ -66,6 +71,11 @@ function initEditors() {
         basicSetup,
         css(),
         oneDark,
+        EditorView.updateListener.of(update => {
+          if (update.docChanged) {
+            updatePreview();
+          }
+        })
       ]
     }),
     parent: document.getElementById('css-editor')
@@ -79,17 +89,24 @@ function initEditors() {
         basicSetup,
         javascript(),
         oneDark,
+        EditorView.updateListener.of(update => {
+          if (update.docChanged) {
+            updatePreview();
+          }
+        })
       ]
     }),
     parent: document.getElementById('js-editor')
   });
-
-  // Set up auto-update for preview
-  const updateInterval = 500; // ms
-  setInterval(updatePreview, updateInterval);
+  
+  // Initial preview render
+  updatePreview();
   
   // Setup export button
   document.getElementById('export-btn').addEventListener('click', exportProject);
+  
+  // Setup run button
+  document.getElementById('run-btn').addEventListener('click', updatePreview);
 }
 
 // Update the preview iframe with the current content
@@ -104,8 +121,17 @@ function updatePreview() {
   // Clear the frame
   frameDoc.open();
   
-  // Insert the HTML content
-  frameDoc.write(htmlContent);
+  // Create a modified version of HTML without external references
+  let modifiedHTML = htmlContent;
+  
+  // Remove any external scripts that might reference app.js
+  modifiedHTML = modifiedHTML.replace(/<script[^>]*src=["']app\.js["'][^>]*><\/script>/g, '');
+  
+  // Remove any external CSS that might reference style.css
+  modifiedHTML = modifiedHTML.replace(/<link[^>]*href=["']style\.css["'][^>]*>/g, '');
+  
+  // Insert the modified HTML content
+  frameDoc.write(modifiedHTML);
   
   // Insert the CSS
   const styleElement = frameDoc.createElement('style');

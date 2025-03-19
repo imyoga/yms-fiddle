@@ -99,6 +99,14 @@ body {
   background-color: #1177bb;
 }
 
+#run-btn {
+  background-color: #4d8b4d;
+}
+
+#run-btn:hover {
+  background-color: #5da15d;
+}
+
 .editor-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
