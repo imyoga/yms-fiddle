@@ -60,6 +60,28 @@ body {
 .actions {
   display: flex;
   gap: 8px;
+  align-items: center;
+}
+
+.project-name-container {
+  display: flex;
+  align-items: center;
+}
+
+.project-name-input {
+  background-color: #3c3c3c;
+  color: var(--vscode-text);
+  border: 1px solid var(--vscode-border);
+  border-radius: 3px;
+  padding: 5px 8px;
+  font-size: 12px;
+  width: 150px;
+  height: 28px;
+  outline: none;
+}
+
+.project-name-input:focus {
+  border-color: var(--vscode-active-tab);
 }
 
 .btn {

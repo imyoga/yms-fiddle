@@ -134,11 +134,21 @@ function exportProject() {
   zip.file("style.css", cssContent);
   zip.file("app.js", jsContent);
   
+  // Get project name from input, fallback to default if empty
+  let projectName = document.getElementById('project-name').value.trim();
+  if (!projectName) {
+    projectName = 'my-project';
+    document.getElementById('project-name').value = projectName;
+  }
+  
+  // Sanitize filename (remove invalid characters)
+  projectName = projectName.replace(/[^\w\-]/g, '-');
+  
   // Generate the zip file and trigger download
   zip.generateAsync({ type: "blob" })
     .then(function(content) {
-      // Use FileSaver to save the zip
-      saveAs(content, "ym-fiddle-project.zip");
+      // Use FileSaver to save the zip with the project name
+      saveAs(content, `${projectName}.zip`);
     });
 }
 
