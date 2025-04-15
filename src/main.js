@@ -16,6 +16,8 @@ import {
   enterAbbreviationMode 
 } from '@emmetio/codemirror6-plugin';
 import { keymap } from '@codemirror/view';
+// Import autocompletion packages
+import { autocompletion, completionKeymap } from '@codemirror/autocomplete';
 
 // Default starter code
 const defaultHTML = `<!DOCTYPE html>
@@ -123,7 +125,7 @@ function initEditors() {
     parent: document.getElementById('css-editor')
   });
 
-  // JavaScript Editor
+  // JavaScript Editor with autocompletion
   jsEditor = new EditorView({
     state: EditorState.create({
       doc: defaultJS,
@@ -133,6 +135,91 @@ function initEditors() {
         oneDark,
         minimapConfig,
         emmetKeymap,
+        // Add autocompletion support
+        autocompletion({
+          override: [
+            (context) => {
+              // Custom suggestions for JavaScript
+              const word = context.matchBefore(/\w*/);
+              if (!word || word.from === word.to) return null;
+              
+              // Custom suggestions
+              const jsCompletions = [
+                { label: 'function', type: 'keyword' },
+                { label: 'return', type: 'keyword' },
+                { label: 'const', type: 'keyword' },
+                { label: 'let', type: 'keyword' },
+                { label: 'var', type: 'keyword' },
+                { label: 'if', type: 'keyword' },
+                { label: 'else', type: 'keyword' },
+                { label: 'for', type: 'keyword' },
+                { label: 'while', type: 'keyword' },
+                { label: 'switch', type: 'keyword' },
+                { label: 'case', type: 'keyword' },
+                { label: 'break', type: 'keyword' },
+                { label: 'continue', type: 'keyword' },
+                { label: 'class', type: 'keyword' },
+                { label: 'extends', type: 'keyword' },
+                { label: 'import', type: 'keyword' },
+                { label: 'export', type: 'keyword' },
+                { label: 'try', type: 'keyword' },
+                { label: 'catch', type: 'keyword' },
+                { label: 'finally', type: 'keyword' },
+                { label: 'throw', type: 'keyword' },
+                { label: 'async', type: 'keyword' },
+                { label: 'await', type: 'keyword' },
+                { label: 'new', type: 'keyword' },
+                { label: 'this', type: 'keyword' },
+                { label: 'super', type: 'keyword' },
+                { label: 'document', type: 'variable' },
+                { label: 'window', type: 'variable' },
+                { label: 'console', type: 'variable' },
+                { label: 'console.log', type: 'function' },
+                { label: 'console.error', type: 'function' },
+                { label: 'console.warn', type: 'function' },
+                { label: 'console.info', type: 'function' },
+                { label: 'console.debug', type: 'function' },
+                { label: 'console.table', type: 'function' },
+                { label: 'console.trace', type: 'function' },
+                { label: 'console.time', type: 'function' },
+                { label: 'console.timeEnd', type: 'function' },
+                { label: 'document.querySelector', type: 'function' },
+                { label: 'document.querySelectorAll', type: 'function' },
+                { label: 'document.getElementById', type: 'function' },
+                { label: 'document.getElementsByClassName', type: 'function' },
+                { label: 'document.getElementsByTagName', type: 'function' },
+                { label: 'document.createElement', type: 'function' },
+                { label: 'document.addEventListener', type: 'function' },
+                { label: 'addEventListener', type: 'function' },
+                { label: 'setTimeout', type: 'function' },
+                { label: 'setInterval', type: 'function' },
+                { label: 'clearTimeout', type: 'function' },
+                { label: 'clearInterval', type: 'function' },
+                { label: 'fetch', type: 'function' },
+                { label: 'Promise', type: 'class' },
+                { label: 'Math', type: 'variable' },
+                { label: 'Array', type: 'class' },
+                { label: 'Object', type: 'class' },
+                { label: 'String', type: 'class' },
+                { label: 'Number', type: 'class' },
+                { label: 'Boolean', type: 'class' },
+                { label: 'Date', type: 'class' },
+                { label: 'RegExp', type: 'class' },
+                { label: 'Map', type: 'class' },
+                { label: 'Set', type: 'class' },
+                { label: 'JSON', type: 'variable' },
+                { label: 'JSON.parse', type: 'function' },
+                { label: 'JSON.stringify', type: 'function' }
+              ];
+              
+              return {
+                from: word.from,
+                options: jsCompletions.filter(c => c.label.startsWith(word.text))
+              };
+            }
+          ]
+        }),
+        keymap.of(completionKeymap),
         EditorView.updateListener.of(update => {
           if (update.docChanged) {
             updatePreview();
