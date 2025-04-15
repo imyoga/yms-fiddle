@@ -136,25 +136,17 @@ function initEditors() {
   
   if (clearBtn) {
     clearBtn.addEventListener('click', resetToBoilerplate);
-    console.log('Clear button event listener set up');
-  } else {
-    console.error('Clear button not found in DOM');
   }
 }
 
 // Reset editors to default boilerplate code
 function resetToBoilerplate() {
-  console.log('Clearing all editors');
-  
   try {
     // Clear HTML editor
     if (htmlEditor && htmlEditor.state) {
       htmlEditor.dispatch({
         changes: {from: 0, to: htmlEditor.state.doc.length, insert: ""}
       });
-      console.log('HTML editor cleared');
-    } else {
-      console.error('HTML editor not initialized');
     }
     
     // Clear CSS editor  
@@ -162,9 +154,6 @@ function resetToBoilerplate() {
       cssEditor.dispatch({
         changes: {from: 0, to: cssEditor.state.doc.length, insert: ""}
       });
-      console.log('CSS editor cleared');
-    } else {
-      console.error('CSS editor not initialized');
     }
     
     // Clear JS editor
@@ -172,15 +161,10 @@ function resetToBoilerplate() {
       jsEditor.dispatch({
         changes: {from: 0, to: jsEditor.state.doc.length, insert: ""}
       });
-      console.log('JS editor cleared');
-    } else {
-      console.error('JS editor not initialized');
     }
     
     // Create an empty preview with minimal structure
     createEmptyPreview();
-    
-    console.log('Editors cleared');
   } catch (error) {
     console.error('Error during clearing:', error);
   }
@@ -234,8 +218,6 @@ function createEmptyPreview() {
     
     frameDoc.write(emptyHTML);
     frameDoc.close();
-    
-    console.log('Empty preview created');
   } catch (error) {
     console.error('Error creating empty preview:', error);
   }
@@ -335,13 +317,10 @@ function exportProject() {
 
 // Initialize the application when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOM loaded, initializing editors and chat');
-  
   // Check if all required elements exist
   const htmlEditorEl = document.getElementById('html-editor');
   const cssEditorEl = document.getElementById('css-editor');
   const jsEditorEl = document.getElementById('js-editor');
-  const clearBtnEl = document.getElementById('clear-btn');
   
   if (!htmlEditorEl || !cssEditorEl || !jsEditorEl) {
     console.error('One or more editor elements not found:', {
@@ -351,14 +330,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   
-  if (!clearBtnEl) {
-    console.error('Clear button not found');
-  }
-  
   // Add event delegation for the entire header actions area
   document.querySelector('.actions').addEventListener('click', (e) => {
     if (e.target && e.target.id === 'clear-btn') {
-      console.log('Clear button clicked via delegation');
       resetToBoilerplate();
     }
   });
