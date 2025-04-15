@@ -8,6 +8,14 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { showMinimap } from '@replit/codemirror-minimap';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+// Import Emmet plugin
+import { 
+  abbreviationTracker, 
+  emmetConfig, 
+  expandAbbreviation,
+  enterAbbreviationMode 
+} from '@emmetio/codemirror6-plugin';
+import { keymap } from '@codemirror/view';
 
 // Default starter code
 const defaultHTML = `<!DOCTYPE html>
@@ -61,6 +69,12 @@ const minimapConfig = showMinimap.compute(['doc'], (state) => {
 
 // Initialize the editors with CodeMirror
 function initEditors() {
+  // Emmet keymap configuration
+  const emmetKeymap = keymap.of([
+    { key: 'Tab', run: expandAbbreviation },
+    { key: 'Ctrl-Space', run: enterAbbreviationMode }
+  ]);
+
   // HTML Editor
   htmlEditor = new EditorView({
     state: EditorState.create({
@@ -70,6 +84,11 @@ function initEditors() {
         html(),
         oneDark,
         minimapConfig,
+        // Add Emmet support for HTML
+        abbreviationTracker({
+          syntax: 'html'
+        }),
+        emmetKeymap,
         EditorView.updateListener.of(update => {
           if (update.docChanged) {
             updatePreview();
@@ -89,6 +108,11 @@ function initEditors() {
         css(),
         oneDark,
         minimapConfig,
+        // Add Emmet support for CSS
+        abbreviationTracker({
+          syntax: 'css'
+        }),
+        emmetKeymap,
         EditorView.updateListener.of(update => {
           if (update.docChanged) {
             updatePreview();
@@ -108,6 +132,7 @@ function initEditors() {
         javascript(),
         oneDark,
         minimapConfig,
+        emmetKeymap,
         EditorView.updateListener.of(update => {
           if (update.docChanged) {
             updatePreview();
