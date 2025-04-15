@@ -121,48 +121,184 @@ function initEditors() {
   // Initial preview render
   updatePreview();
   
-  // Setup export button
-  document.getElementById('export-btn').addEventListener('click', exportProject);
+  // Setup button event listeners
+  const exportBtn = document.getElementById('export-btn');
+  const runBtn = document.getElementById('run-btn');
+  const clearBtn = document.getElementById('clear-btn');
   
-  // Setup run button
-  document.getElementById('run-btn').addEventListener('click', updatePreview);
+  if (exportBtn) {
+    exportBtn.addEventListener('click', exportProject);
+  }
+  
+  if (runBtn) {
+    runBtn.addEventListener('click', updatePreview);
+  }
+  
+  if (clearBtn) {
+    clearBtn.addEventListener('click', resetToBoilerplate);
+    console.log('Clear button event listener set up');
+  } else {
+    console.error('Clear button not found in DOM');
+  }
 }
+
+// Reset editors to default boilerplate code
+function resetToBoilerplate() {
+  console.log('Clearing all editors');
+  
+  try {
+    // Clear HTML editor
+    if (htmlEditor && htmlEditor.state) {
+      htmlEditor.dispatch({
+        changes: {from: 0, to: htmlEditor.state.doc.length, insert: ""}
+      });
+      console.log('HTML editor cleared');
+    } else {
+      console.error('HTML editor not initialized');
+    }
+    
+    // Clear CSS editor  
+    if (cssEditor && cssEditor.state) {
+      cssEditor.dispatch({
+        changes: {from: 0, to: cssEditor.state.doc.length, insert: ""}
+      });
+      console.log('CSS editor cleared');
+    } else {
+      console.error('CSS editor not initialized');
+    }
+    
+    // Clear JS editor
+    if (jsEditor && jsEditor.state) {
+      jsEditor.dispatch({
+        changes: {from: 0, to: jsEditor.state.doc.length, insert: ""}
+      });
+      console.log('JS editor cleared');
+    } else {
+      console.error('JS editor not initialized');
+    }
+    
+    // Create an empty preview with minimal structure
+    createEmptyPreview();
+    
+    console.log('Editors cleared');
+  } catch (error) {
+    console.error('Error during clearing:', error);
+  }
+}
+
+// Create an empty preview with minimal structure
+function createEmptyPreview() {
+  try {
+    const resultFrame = document.getElementById('result-frame');
+    if (!resultFrame) {
+      console.error('Result frame not found');
+      return;
+    }
+    
+    const frameDoc = resultFrame.contentDocument || resultFrame.contentWindow.document;
+    
+    // Clear the frame
+    frameDoc.open();
+    
+    // Create a minimal HTML structure
+    const emptyHTML = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Empty Preview</title>
+          <style>
+            body {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              height: 100vh;
+              margin: 0;
+              background-color: #f5f5f5;
+              color: #666;
+              font-family: sans-serif;
+            }
+            .message {
+              text-align: center;
+              padding: 20px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="message">
+            <p>Preview cleared. Start coding to see results.</p>
+          </div>
+        </body>
+      </html>
+    `;
+    
+    frameDoc.write(emptyHTML);
+    frameDoc.close();
+    
+    console.log('Empty preview created');
+  } catch (error) {
+    console.error('Error creating empty preview:', error);
+  }
+}
+
+// Expose function globally for debugging
+window.resetEditors = resetToBoilerplate;
 
 // Update the preview iframe with the current content
 function updatePreview() {
-  const htmlContent = htmlEditor.state.doc.toString();
-  const cssContent = cssEditor.state.doc.toString();
-  const jsContent = jsEditor.state.doc.toString();
+  try {
+    const htmlContent = htmlEditor.state.doc.toString();
+    const cssContent = cssEditor.state.doc.toString();
+    const jsContent = jsEditor.state.doc.toString();
 
-  const resultFrame = document.getElementById('result-frame');
-  const frameDoc = resultFrame.contentDocument || resultFrame.contentWindow.document;
-  
-  // Clear the frame
-  frameDoc.open();
-  
-  // Create a modified version of HTML without external references
-  let modifiedHTML = htmlContent;
-  
-  // Remove any external scripts that might reference app.js
-  modifiedHTML = modifiedHTML.replace(/<script[^>]*src=["']app\.js["'][^>]*><\/script>/g, '');
-  
-  // Remove any external CSS that might reference style.css
-  modifiedHTML = modifiedHTML.replace(/<link[^>]*href=["']style\.css["'][^>]*>/g, '');
-  
-  // Insert the modified HTML content
-  frameDoc.write(modifiedHTML);
-  
-  // Insert the CSS
-  const styleElement = frameDoc.createElement('style');
-  styleElement.textContent = cssContent;
-  frameDoc.head.appendChild(styleElement);
-  
-  // Insert the JavaScript
-  const scriptElement = frameDoc.createElement('script');
-  scriptElement.textContent = jsContent;
-  frameDoc.body.appendChild(scriptElement);
-  
-  frameDoc.close();
+    const resultFrame = document.getElementById('result-frame');
+    if (!resultFrame) {
+      console.error('Result frame not found');
+      return;
+    }
+    
+    const frameDoc = resultFrame.contentDocument || resultFrame.contentWindow.document;
+    
+    // Clear the frame
+    frameDoc.open();
+    
+    // Create a modified version of HTML without external references
+    let modifiedHTML = htmlContent;
+    
+    // Remove any external scripts that might reference app.js
+    modifiedHTML = modifiedHTML.replace(/<script[^>]*src=["']app\.js["'][^>]*><\/script>/g, '');
+    
+    // Remove any external CSS that might reference style.css
+    modifiedHTML = modifiedHTML.replace(/<link[^>]*href=["']style\.css["'][^>]*>/g, '');
+    
+    // Insert the modified HTML content
+    frameDoc.write(modifiedHTML || '<html><head></head><body></body></html>');
+    
+    // If the document has no head or body, don't try to append elements
+    if (!frameDoc.head || !frameDoc.body) {
+      console.warn('Preview frame has no head or body elements');
+      frameDoc.close();
+      return;
+    }
+    
+    // Insert the CSS
+    if (cssContent) {
+      const styleElement = frameDoc.createElement('style');
+      styleElement.textContent = cssContent;
+      frameDoc.head.appendChild(styleElement);
+    }
+    
+    // Insert the JavaScript
+    if (jsContent) {
+      const scriptElement = frameDoc.createElement('script');
+      scriptElement.textContent = jsContent;
+      frameDoc.body.appendChild(scriptElement);
+    }
+    
+    frameDoc.close();
+  } catch (error) {
+    console.error('Error updating preview:', error);
+  }
 }
 
 // Export the project as a zip file
@@ -199,6 +335,34 @@ function exportProject() {
 
 // Initialize the application when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('DOM loaded, initializing editors and chat');
+  
+  // Check if all required elements exist
+  const htmlEditorEl = document.getElementById('html-editor');
+  const cssEditorEl = document.getElementById('css-editor');
+  const jsEditorEl = document.getElementById('js-editor');
+  const clearBtnEl = document.getElementById('clear-btn');
+  
+  if (!htmlEditorEl || !cssEditorEl || !jsEditorEl) {
+    console.error('One or more editor elements not found:', {
+      htmlEditor: !!htmlEditorEl,
+      cssEditor: !!cssEditorEl,
+      jsEditor: !!jsEditorEl
+    });
+  }
+  
+  if (!clearBtnEl) {
+    console.error('Clear button not found');
+  }
+  
+  // Add event delegation for the entire header actions area
+  document.querySelector('.actions').addEventListener('click', (e) => {
+    if (e.target && e.target.id === 'clear-btn') {
+      console.log('Clear button clicked via delegation');
+      resetToBoilerplate();
+    }
+  });
+  
   initEditors();
   initChat();
 });

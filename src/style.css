@@ -68,6 +68,7 @@ body {
 .project-name-container {
   display: flex;
   align-items: center;
+  gap: 8px;
 }
 
 .project-name-input {
@@ -107,6 +108,18 @@ body {
 
 #run-btn:hover {
   background-color: #5da15d;
+}
+
+#clear-btn {
+  background-color: #8b4d4d;
+  margin-right: 0;
+  position: relative;
+  z-index: 5;
+  min-width: 50px;
+}
+
+#clear-btn:hover {
+  background-color: #a15d5d;
 }
 
 .main-container {
